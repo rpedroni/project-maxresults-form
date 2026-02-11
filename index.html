@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>MaxResults — Pesquisa</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 16px 80px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 32px 0 24px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .header .accent {
+      color: #ffd700;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #222;
+      border-radius: 2px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ffd700, #ffaa00);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    .step {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question {
+      margin-bottom: 32px;
+    }
+
+    .question-number {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ffd700;
+      margin-bottom: 8px;
+    }
+
+    .question h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .question .subtitle {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 16px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      background: #161616;
+      border: 2px solid #222;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option:hover {
+      border-color: #333;
+      background: #1a1a1a;
+    }
+
+    .option.selected {
+      border-color: #ffd700;
+      background: #1a1800;
+    }
+
+    .option input {
+      display: none;
+    }
+
+    .option .check {
+      width: 22px;
+      height: 22px;
+      border: 2px solid #444;
+      border-radius: 50%;
+      margin-right: 12px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .option .check.checkbox {
+      border-radius: 6px;
+    }
+
+    .option.selected .check {
+      border-color: #ffd700;
+      background: #ffd700;
+    }
+
+    .option.selected .check::after {
+      content: '✓';
+      color: #000;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .option span {
+      font-size: 15px;
+      color: #ccc;
+    }
+
+    .option.selected span {
+      color: #fff;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: #161616;
+      border: 2px solid #222;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: #ffd700;
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 32px;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-back {
+      background: #222;
+      color: #888;
+    }
+
+    .btn-back:hover {
+      background: #2a2a2a;
+      color: #aaa;
+    }
+
+    .btn-next {
+      background: linear-gradient(135deg, #ffd700, #ffaa00);
+      color: #000;
+      flex: 1;
+    }
+
+    .btn-next:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+    }
+
+    .btn-next:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, #00c853, #00a843);
+      color: #fff;
+      flex: 1;
+      font-size: 16px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(0, 200, 83, 0.3);
+    }
+
+    .success-screen {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .success-screen .emoji {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .success-screen h2 {
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .success-screen p {
+      font-size: 15px;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    .step-counter {
+      text-align: center;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Max<span class="accent">Results</span></h1>
+      <p>Queremos te conhecer melhor pra criar treinos incríveis pra você! Leva menos de 3 minutos. 💪</p>
+    </div>
+
+    <div class="step-counter" id="stepCounter">Pergunta 1 de 10</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+    </div>
+
+    <form id="surveyForm">
+      <!-- Q1: Nome -->
+      <div class="step active" data-step="1">
+        <div class="question">
+          <div class="question-number">Pergunta 1</div>
+          <h2>Qual seu nome?</h2>
+          <div class="subtitle">Primeiro nome tá ótimo!</div>
+          <input type="text" id="q1_nome" placeholder="Seu nome..." required>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q2: Objetivo -->
+      <div class="step" data-step="2">
+        <div class="question">
+          <div class="question-number">Pergunta 2</div>
+          <h2>Qual seu principal objetivo hoje?</h2>
+          <div class="options" data-name="q2_objetivo" data-type="radio">
+            <label class="option"><input type="radio" name="q2_objetivo" value="Emagrecer"><div class="check"></div><span>Emagrecer / Perder peso</span></label>
+            <label class="option"><input type="radio" name="q2_objetivo" value="Definir"><div class="check"></div><span>Definir o corpo / Tonificar</span></label>
+            <label class="option"><input type="radio" name="q2_objetivo" value="Reduzir medidas"><div class="check"></div><span>Reduzir medidas</span></label>
+            <label class="option"><input type="radio" name="q2_objetivo" value="Condicionamento"><div class="check"></div><span>Melhorar condicionamento físico</span></label>
+            <label class="option"><input type="radio" name="q2_objetivo" value="Saúde geral"><div class="check"></div><span>Saúde e bem-estar geral</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q3: Métodos anteriores -->
+      <div class="step" data-step="3">
+        <div class="question">
+          <div class="question-number">Pergunta 3</div>
+          <h2>O que você já tentou pra atingir esse objetivo?</h2>
+          <div class="subtitle">Pode marcar vários!</div>
+          <div class="options" data-name="q3_metodos" data-type="checkbox">
+            <label class="option"><input type="checkbox" name="q3_metodos" value="Academia/musculação"><div class="check checkbox"></div><span>Academia / Musculação</span></label>
+            <label class="option"><input type="checkbox" name="q3_metodos" value="Corrida/caminhada"><div class="check checkbox"></div><span>Corrida / Caminhada</span></label>
+            <label class="option"><input type="checkbox" name="q3_metodos" value="Aulas em grupo"><div class="check checkbox"></div><span>Aulas em grupo (spinning, funcional, etc.)</span></label>
+            <label class="option"><input type="checkbox" name="q3_metodos" value="Pilates/Yoga"><div class="check checkbox"></div><span>Pilates / Yoga</span></label>
+            <label class="option"><input type="checkbox" name="q3_metodos" value="Apps de treino"><div class="check checkbox"></div><span>Apps de treino (Freeletics, Nike, etc.)</span></label>
+            <label class="option"><input type="checkbox" name="q3_metodos" value="Dieta"><div class="check checkbox"></div><span>Dieta por conta própria / Nutricionista</span></label>
+            <label class="option"><input type="checkbox" name="q3_metodos" value="Nada ainda"><div class="check checkbox"></div><span>Nada ainda — essa é minha primeira vez</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q4: Por que desistiu (MOM TEST KEY) -->
+      <div class="step" data-step="4">
+        <div class="question">
+          <div class="question-number">Pergunta 4</div>
+          <h2>O que te fez parar ou desistir?</h2>
+          <div class="subtitle">Seja sincera! Não tem resposta errada 😊</div>
+          <textarea id="q4_desistiu" placeholder="Ex: era chato, não tinha tempo, não vi resultado, era caro..."></textarea>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q5: O que desmotiva -->
+      <div class="step" data-step="5">
+        <div class="question">
+          <div class="question-number">Pergunta 5</div>
+          <h2>O que mais te desmotiva num treino?</h2>
+          <div class="subtitle">Pode marcar vários!</div>
+          <div class="options" data-name="q5_desmotiva" data-type="checkbox">
+            <label class="option"><input type="checkbox" name="q5_desmotiva" value="Monotonia/repetitivo"><div class="check checkbox"></div><span>É monótono / sempre a mesma coisa</span></label>
+            <label class="option"><input type="checkbox" name="q5_desmotiva" value="Não vejo resultado"><div class="check checkbox"></div><span>Não vejo resultado rápido</span></label>
+            <label class="option"><input type="checkbox" name="q5_desmotiva" value="Treino sozinha"><div class="check checkbox"></div><span>Treinar sozinha é chato</span></label>
+            <label class="option"><input type="checkbox" name="q5_desmotiva" value="Não sei o que fazer"><div class="check checkbox"></div><span>Não sei o que fazer na academia</span></label>
+            <label class="option"><input type="checkbox" name="q5_desmotiva" value="Sem tempo"><div class="check checkbox"></div><span>Falta de tempo</span></label>
+            <label class="option"><input type="checkbox" name="q5_desmotiva" value="Musculação é chata"><div class="check checkbox"></div><span>Musculação é chata / não gosto</span></label>
+            <label class="option"><input type="checkbox" name="q5_desmotiva" value="Vergonha"><div class="check checkbox"></div><span>Me sinto deslocada / com vergonha</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q6: Experiência com treino digital -->
+      <div class="step" data-step="6">
+        <div class="question">
+          <div class="question-number">Pergunta 6</div>
+          <h2>Você já treinou seguindo vídeo ou app?</h2>
+          <div class="options" data-name="q6_digital" data-type="radio">
+            <label class="option"><input type="radio" name="q6_digital" value="Sim, gostei"><div class="check"></div><span>Sim, e gostei!</span></label>
+            <label class="option"><input type="radio" name="q6_digital" value="Sim, não curti"><div class="check"></div><span>Sim, mas não curti</span></label>
+            <label class="option"><input type="radio" name="q6_digital" value="Nunca tentei"><div class="check"></div><span>Nunca tentei</span></label>
+            <label class="option"><input type="radio" name="q6_digital" value="Tentei mas desisti"><div class="check"></div><span>Tentei mas desisti rápido</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q7: Quanto investe -->
+      <div class="step" data-step="7">
+        <div class="question">
+          <div class="question-number">Pergunta 7</div>
+          <h2>Quanto você investe por mês em exercício/saúde?</h2>
+          <div class="subtitle">Academia, personal, apps, suplementos, etc.</div>
+          <div class="options" data-name="q7_investimento" data-type="radio">
+            <label class="option"><input type="radio" name="q7_investimento" value="Nada"><div class="check"></div><span>Nada no momento</span></label>
+            <label class="option"><input type="radio" name="q7_investimento" value="Até R$100"><div class="check"></div><span>Até R$100/mês</span></label>
+            <label class="option"><input type="radio" name="q7_investimento" value="R$100-300"><div class="check"></div><span>R$100 a R$300/mês</span></label>
+            <label class="option"><input type="radio" name="q7_investimento" value="R$300-500"><div class="check"></div><span>R$300 a R$500/mês</span></label>
+            <label class="option"><input type="radio" name="q7_investimento" value="Mais de R$500"><div class="check"></div><span>Mais de R$500/mês</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q8: Modalidades preferidas -->
+      <div class="step" data-step="8">
+        <div class="question">
+          <div class="question-number">Pergunta 8</div>
+          <h2>O que mais te atrai?</h2>
+          <div class="subtitle">Pode marcar vários! Não precisa ter experiência.</div>
+          <div class="options" data-name="q8_modalidades" data-type="checkbox">
+            <label class="option"><input type="checkbox" name="q8_modalidades" value="Aula de luta/combate"><div class="check checkbox"></div><span>🥊 Aula de luta / combate</span></label>
+            <label class="option"><input type="checkbox" name="q8_modalidades" value="Step"><div class="check checkbox"></div><span>🪜 Step</span></label>
+            <label class="option"><input type="checkbox" name="q8_modalidades" value="Bike/spinning"><div class="check checkbox"></div><span>🚴 Bike / Spinning</span></label>
+            <label class="option"><input type="checkbox" name="q8_modalidades" value="Trampolim/jump"><div class="check checkbox"></div><span>🤸 Trampolim / Jump</span></label>
+            <label class="option"><input type="checkbox" name="q8_modalidades" value="Musculação com música"><div class="check checkbox"></div><span>💪 Musculação animada com música</span></label>
+            <label class="option"><input type="checkbox" name="q8_modalidades" value="Yoga/Pilates"><div class="check checkbox"></div><span>🧘 Yoga / Pilates / Alongamento</span></label>
+            <label class="option"><input type="checkbox" name="q8_modalidades" value="Funcional"><div class="check checkbox"></div><span>🏋️ Funcional</span></label>
+            <label class="option"><input type="checkbox" name="q8_modalidades" value="Dança"><div class="check checkbox"></div><span>💃 Dança</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q9: Música -->
+      <div class="step" data-step="9">
+        <div class="question">
+          <div class="question-number">Pergunta 9</div>
+          <h2>Música é importante pra você no treino?</h2>
+          <div class="options" data-name="q9_musica" data-type="radio">
+            <label class="option"><input type="radio" name="q9_musica" value="Essencial"><div class="check"></div><span>🎵 Essencial — não treino sem música!</span></label>
+            <label class="option"><input type="radio" name="q9_musica" value="Gosto"><div class="check"></div><span>Gosto, mas não é obrigatório</span></label>
+            <label class="option"><input type="radio" name="q9_musica" value="Tanto faz"><div class="check"></div><span>Tanto faz</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q10: Frequência -->
+      <div class="step" data-step="10">
+        <div class="question">
+          <div class="question-number">Pergunta 10</div>
+          <h2>Quantos dias por semana você consegue treinar de verdade?</h2>
+          <div class="subtitle">Sem mentir pra si mesma 😄</div>
+          <div class="options" data-name="q10_frequencia" data-type="radio">
+            <label class="option"><input type="radio" name="q10_frequencia" value="2x"><div class="check"></div><span>2 dias</span></label>
+            <label class="option"><input type="radio" name="q10_frequencia" value="3x"><div class="check"></div><span>3 dias</span></label>
+            <label class="option"><input type="radio" name="q10_frequencia" value="4x"><div class="check"></div><span>4 dias</span></label>
+            <label class="option"><input type="radio" name="q10_frequencia" value="5x+"><div class="check"></div><span>5 ou mais dias</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-submit" onclick="submitForm()">Enviar ✓</button>
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div class="step" data-step="success">
+        <div class="success-screen">
+          <div class="emoji">🎉</div>
+          <h2>Obrigado!</h2>
+          <p>Suas respostas foram enviadas com sucesso.<br>Elas vão nos ajudar a criar algo incrível pra você! 💪</p>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 10;
+
+    // Handle option selection
+    document.querySelectorAll('.option').forEach(option => {
+      option.addEventListener('click', () => {
+        const input = option.querySelector('input');
+        const container = option.closest('.options');
+        const type = container.dataset.type;
+
+        if (type === 'radio') {
+          container.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+          input.checked = true;
+        } else {
+          input.checked = !input.checked;
+          option.classList.toggle('selected', input.checked);
+        }
+      });
+    });
+
+    function updateProgress() {
+      const pct = (currentStep / totalSteps) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('stepCounter').textContent = 
+        currentStep <= totalSteps ? `Pergunta ${currentStep} de ${totalSteps}` : '';
+    }
+
+    function showStep(n) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      const target = n === 'success' ? 
+        document.querySelector('[data-step="success"]') : 
+        document.querySelector(`[data-step="${n}"]`);
+      if (target) {
+        target.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function nextStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        showStep(currentStep);
+        updateProgress();
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+        updateProgress();
+      }
+    }
+
+    function collectData() {
+      const data = {};
+      data.nome = document.getElementById('q1_nome')?.value || '';
+      data.objetivo = document.querySelector('input[name="q2_objetivo"]:checked')?.value || '';
+      data.metodos = Array.from(document.querySelectorAll('input[name="q3_metodos"]:checked')).map(i => i.value);
+      data.desistiu = document.getElementById('q4_desistiu')?.value || '';
+      data.desmotiva = Array.from(document.querySelectorAll('input[name="q5_desmotiva"]:checked')).map(i => i.value);
+      data.digital = document.querySelector('input[name="q6_digital"]:checked')?.value || '';
+      data.investimento = document.querySelector('input[name="q7_investimento"]:checked')?.value || '';
+      data.modalidades = Array.from(document.querySelectorAll('input[name="q8_modalidades"]:checked')).map(i => i.value);
+      data.musica = document.querySelector('input[name="q9_musica"]:checked')?.value || '';
+      data.frequencia = document.querySelector('input[name="q10_frequencia"]:checked')?.value || '';
+      data.timestamp = new Date().toISOString();
+      return data;
+    }
+
+    async function submitForm() {
+      const data = collectData();
+      
+      // Send to Google Sheets via Apps Script Web App
+      const SCRIPT_URL = 'PLACEHOLDER_SCRIPT_URL';
+      
+      try {
+        if (SCRIPT_URL !== 'PLACEHOLDER_SCRIPT_URL') {
+          await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        }
+      } catch(e) {
+        console.log('Submission note:', e);
+      }
+
+      // Also store locally
+      const responses = JSON.parse(localStorage.getItem('maxresults_responses') || '[]');
+      responses.push(data);
+      localStorage.setItem('maxresults_responses', JSON.stringify(responses));
+
+      // Show success
+      showStep('success');
+      document.getElementById('stepCounter').textContent = '';
+      document.getElementById('progressFill').style.width = '100%';
+    }
+  </script>
+</body>
+</html>
