@@ -565,23 +565,50 @@
     async function submitForm() {
       const data = collectData();
       
-      // Send to Google Sheets via Apps Script Web App
-      const SCRIPT_URL = 'PLACEHOLDER_SCRIPT_URL';
-      
+      // Format data for email
+      const emailBody = [
+        `📋 NOVA RESPOSTA - MaxResults`,
+        ``,
+        `👤 Nome: ${data.nome}`,
+        `🎯 Objetivo: ${data.objetivo}`,
+        `📝 Métodos anteriores: ${data.metodos.join(', ') || 'Nenhum'}`,
+        `❌ Por que desistiu: ${data.desistiu || 'Não respondeu'}`,
+        `😤 O que desmotiva: ${data.desmotiva.join(', ') || 'Nenhum'}`,
+        `📱 Treino digital: ${data.digital}`,
+        `💰 Investimento mensal: ${data.investimento}`,
+        `🏋️ Modalidades preferidas: ${data.modalidades.join(', ') || 'Nenhuma'}`,
+        `🎵 Música: ${data.musica}`,
+        `📅 Frequência: ${data.frequencia}`,
+        `⏰ Data: ${new Date().toLocaleString('pt-BR')}`
+      ].join('\n');
+
+      // Send via FormSubmit.co (free email forwarding)
       try {
-        if (SCRIPT_URL !== 'PLACEHOLDER_SCRIPT_URL') {
-          await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-        }
+        const formData = new FormData();
+        formData.append('_subject', `📋 MaxResults — Nova resposta de ${data.nome}`);
+        formData.append('_template', 'box');
+        formData.append('_captcha', 'false');
+        formData.append('message', emailBody);
+        formData.append('Nome', data.nome);
+        formData.append('Objetivo', data.objetivo);
+        formData.append('Metodos Anteriores', data.metodos.join(', '));
+        formData.append('Por que Desistiu', data.desistiu);
+        formData.append('O que Desmotiva', data.desmotiva.join(', '));
+        formData.append('Treino Digital', data.digital);
+        formData.append('Investimento Mensal', data.investimento);
+        formData.append('Modalidades Preferidas', data.modalidades.join(', '));
+        formData.append('Musica', data.musica);
+        formData.append('Frequencia', data.frequencia);
+        
+        await fetch('https://formsubmit.co/ajax/luisaoribeiro75@gmail.com', {
+          method: 'POST',
+          body: formData
+        });
       } catch(e) {
-        console.log('Submission note:', e);
+        console.log('Email submission note:', e);
       }
 
-      // Also store locally
+      // Also store locally as backup
       const responses = JSON.parse(localStorage.getItem('maxresults_responses') || '[]');
       responses.push(data);
       localStorage.setItem('maxresults_responses', JSON.stringify(responses));
