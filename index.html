@@ -351,8 +351,21 @@
         <div class="question">
           <div class="question-number">Pergunta 4</div>
           <h2>O que te fez parar ou desistir?</h2>
-          <div class="subtitle">Seja sincera! Não tem resposta errada 😊</div>
-          <textarea id="q4_desistiu" placeholder="Ex: era chato, não tinha tempo, não vi resultado, era caro..."></textarea>
+          <div class="subtitle">Pode marcar vários! Seja sincera 😊</div>
+          <div class="options" data-name="q4_desistiu" data-type="checkbox">
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Falta de tempo"><div class="check checkbox"></div><span>Falta de tempo</span></label>
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Era muito caro"><div class="check checkbox"></div><span>Era muito caro</span></label>
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Não vi resultado"><div class="check checkbox"></div><span>Não vi resultado</span></label>
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Era chato/monótono"><div class="check checkbox"></div><span>Era chato / monótono</span></label>
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Não sabia o que fazer"><div class="check checkbox"></div><span>Não sabia o que fazer sozinha</span></label>
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Preguiça/desmotivação"><div class="check checkbox"></div><span>Preguiça / perdi a motivação</span></label>
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Lesão/problema de saúde"><div class="check checkbox"></div><span>Lesão ou problema de saúde</span></label>
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Mudança de rotina"><div class="check checkbox"></div><span>Mudança de rotina (trabalho, filhos, etc.)</span></label>
+            <label class="option"><input type="checkbox" name="q4_desistiu" value="Não desisti"><div class="check checkbox"></div><span>Não desisti — ainda pratico!</span></label>
+          </div>
+          <div style="margin-top: 12px;">
+            <input type="text" id="q4_outro" placeholder="Outro motivo? (opcional)">
+          </div>
         </div>
         <div class="nav">
           <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
@@ -551,7 +564,9 @@
       data.nome = document.getElementById('q1_nome')?.value || '';
       data.objetivo = document.querySelector('input[name="q2_objetivo"]:checked')?.value || '';
       data.metodos = Array.from(document.querySelectorAll('input[name="q3_metodos"]:checked')).map(i => i.value);
-      data.desistiu = document.getElementById('q4_desistiu')?.value || '';
+      data.desistiu = Array.from(document.querySelectorAll('input[name="q4_desistiu"]:checked')).map(i => i.value);
+      const q4outro = document.getElementById('q4_outro')?.value;
+      if (q4outro) data.desistiu.push('Outro: ' + q4outro);
       data.desmotiva = Array.from(document.querySelectorAll('input[name="q5_desmotiva"]:checked')).map(i => i.value);
       data.digital = document.querySelector('input[name="q6_digital"]:checked')?.value || '';
       data.investimento = document.querySelector('input[name="q7_investimento"]:checked')?.value || '';
@@ -572,7 +587,7 @@
         `👤 Nome: ${data.nome}`,
         `🎯 Objetivo: ${data.objetivo}`,
         `📝 Métodos anteriores: ${data.metodos.join(', ') || 'Nenhum'}`,
-        `❌ Por que desistiu: ${data.desistiu || 'Não respondeu'}`,
+        `❌ Por que desistiu: ${Array.isArray(data.desistiu) ? data.desistiu.join(', ') : data.desistiu || 'Não respondeu'}`,
         `😤 O que desmotiva: ${data.desmotiva.join(', ') || 'Nenhum'}`,
         `📱 Treino digital: ${data.digital}`,
         `💰 Investimento mensal: ${data.investimento}`,
@@ -592,7 +607,7 @@
         formData.append('Nome', data.nome);
         formData.append('Objetivo', data.objetivo);
         formData.append('Metodos Anteriores', data.metodos.join(', '));
-        formData.append('Por que Desistiu', data.desistiu);
+        formData.append('Por que Desistiu', Array.isArray(data.desistiu) ? data.desistiu.join(', ') : data.desistiu);
         formData.append('O que Desmotiva', data.desmotiva.join(', '));
         formData.append('Treino Digital', data.digital);
         formData.append('Investimento Mensal', data.investimento);
