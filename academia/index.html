@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Pesquisa — Gestão de Academia</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px 16px 80px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 32px 0 24px;
+    }
+
+    .header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .header .accent {
+      color: #d4a017;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    .header .time {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 14px;
+      background: #1a1a10;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #d4a017;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #222;
+      border-radius: 2px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #d4a017, #f0c040);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    .step {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question {
+      margin-bottom: 32px;
+    }
+
+    .question-number {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #d4a017;
+      margin-bottom: 8px;
+    }
+
+    .question h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .question .subtitle {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 16px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      background: #161616;
+      border: 2px solid #222;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option:hover {
+      border-color: #333;
+      background: #1a1a1a;
+    }
+
+    .option.selected {
+      border-color: #d4a017;
+      background: #1a1a10;
+    }
+
+    .option input {
+      display: none;
+    }
+
+    .option .check {
+      width: 22px;
+      height: 22px;
+      border: 2px solid #444;
+      border-radius: 50%;
+      margin-right: 12px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .option .check.checkbox {
+      border-radius: 6px;
+    }
+
+    .option.selected .check {
+      border-color: #d4a017;
+      background: #d4a017;
+    }
+
+    .option.selected .check::after {
+      content: '✓';
+      color: #000;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .option span {
+      font-size: 15px;
+      color: #ccc;
+    }
+
+    .option.selected span {
+      color: #fff;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      background: #161616;
+      border: 2px solid #222;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: #d4a017;
+    }
+
+    textarea {
+      min-height: 100px;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 32px;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-back {
+      background: #222;
+      color: #888;
+    }
+
+    .btn-back:hover {
+      background: #2a2a2a;
+      color: #aaa;
+    }
+
+    .btn-next {
+      background: linear-gradient(135deg, #d4a017, #b8860b);
+      color: #000;
+      flex: 1;
+      font-weight: 700;
+    }
+
+    .btn-next:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(212, 160, 23, 0.3);
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, #00c853, #00a843);
+      color: #fff;
+      flex: 1;
+      font-size: 16px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(0, 200, 83, 0.3);
+    }
+
+    .success-screen {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .success-screen .emoji {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .success-screen h2 {
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .success-screen p {
+      font-size: 15px;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    .step-counter {
+      text-align: center;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .privacy {
+      text-align: center;
+      font-size: 12px;
+      color: #444;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏢 Pesquisa sobre <span class="accent">Gestão de Academia</span></h1>
+      <p>Estamos pesquisando os maiores desafios de donos e gestores de academia. Suas respostas são muito valiosas!</p>
+      <div class="time">⏱ Menos de 3 minutos</div>
+    </div>
+
+    <div class="step-counter" id="stepCounter">Pergunta 1 de 10</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+    </div>
+
+    <form id="surveyForm">
+      <!-- Q1: Nome -->
+      <div class="step active" data-step="1">
+        <div class="question">
+          <div class="question-number">Pergunta 1</div>
+          <h2>Qual seu nome?</h2>
+          <input type="text" id="q1_nome" placeholder="Seu nome..." required>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q2: Nome da academia -->
+      <div class="step" data-step="2">
+        <div class="question">
+          <div class="question-number">Pergunta 2</div>
+          <h2>Qual o nome da sua academia?</h2>
+          <div class="subtitle">Opcional — pode deixar em branco se preferir</div>
+          <input type="text" id="q2_academia" placeholder="Nome da academia...">
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q3: Tamanho da base -->
+      <div class="step" data-step="3">
+        <div class="question">
+          <div class="question-number">Pergunta 3</div>
+          <h2>Quantos alunos ativos vocês têm hoje?</h2>
+          <div class="options" data-name="q3_alunos" data-type="radio">
+            <label class="option"><input type="radio" name="q3_alunos" value="Até 100"><div class="check"></div><span>Até 100</span></label>
+            <label class="option"><input type="radio" name="q3_alunos" value="100-300"><div class="check"></div><span>100 a 300</span></label>
+            <label class="option"><input type="radio" name="q3_alunos" value="300-500"><div class="check"></div><span>300 a 500</span></label>
+            <label class="option"><input type="radio" name="q3_alunos" value="500-1000"><div class="check"></div><span>500 a 1000</span></label>
+            <label class="option"><input type="radio" name="q3_alunos" value="1000+"><div class="check"></div><span>Mais de 1000</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q4: Inativos -->
+      <div class="step" data-step="4">
+        <div class="question">
+          <div class="question-number">Pergunta 4</div>
+          <h2>Aproximadamente quantos alunos cancelaram ou ficaram inativos nos últimos 12 meses?</h2>
+          <div class="options" data-name="q4_inativos" data-type="radio">
+            <label class="option"><input type="radio" name="q4_inativos" value="Poucos (até 10%)"><div class="check"></div><span>Poucos (até 10% da base)</span></label>
+            <label class="option"><input type="radio" name="q4_inativos" value="Alguns (10-30%)"><div class="check"></div><span>Alguns (10 a 30%)</span></label>
+            <label class="option"><input type="radio" name="q4_inativos" value="Muitos (30-50%)"><div class="check"></div><span>Muitos (30 a 50%)</span></label>
+            <label class="option"><input type="radio" name="q4_inativos" value="Maioria (50%+)"><div class="check"></div><span>A maioria (mais de 50%)</span></label>
+            <label class="option"><input type="radio" name="q4_inativos" value="Não sei"><div class="check"></div><span>Não sei dizer</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q5: Motivo de cancelamento -->
+      <div class="step" data-step="5">
+        <div class="question">
+          <div class="question-number">Pergunta 5</div>
+          <h2>Quais os principais motivos que os alunos dão quando cancelam?</h2>
+          <div class="subtitle">Pode marcar vários!</div>
+          <div class="options" data-name="q5_motivos" data-type="checkbox">
+            <label class="option"><input type="checkbox" name="q5_motivos" value="Financeiro"><div class="check checkbox"></div><span>💰 Financeiro (caro demais)</span></label>
+            <label class="option"><input type="checkbox" name="q5_motivos" value="Falta de tempo"><div class="check checkbox"></div><span>⏰ Falta de tempo</span></label>
+            <label class="option"><input type="checkbox" name="q5_motivos" value="Desmotivação"><div class="check checkbox"></div><span>😔 Desmotivação / não vê resultado</span></label>
+            <label class="option"><input type="checkbox" name="q5_motivos" value="Mudança de rotina"><div class="check checkbox"></div><span>🔄 Mudança de rotina / trabalho</span></label>
+            <label class="option"><input type="checkbox" name="q5_motivos" value="Mudou de cidade"><div class="check checkbox"></div><span>🏠 Mudou de cidade / bairro</span></label>
+            <label class="option"><input type="checkbox" name="q5_motivos" value="Concorrência"><div class="check checkbox"></div><span>🏋️ Foi pra outra academia</span></label>
+            <label class="option"><input type="checkbox" name="q5_motivos" value="Não se adaptou"><div class="check checkbox"></div><span>😐 Não se adaptou ao ambiente</span></label>
+            <label class="option"><input type="checkbox" name="q5_motivos" value="Somem"><div class="check checkbox"></div><span>👻 Simplesmente somem (sem explicação)</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q6: O que fazem pra reativar -->
+      <div class="step" data-step="6">
+        <div class="question">
+          <div class="question-number">Pergunta 6</div>
+          <h2>O que vocês fazem hoje pra tentar recuperar alunos inativos?</h2>
+          <div class="subtitle">Pode marcar vários!</div>
+          <div class="options" data-name="q6_reativacao" data-type="checkbox">
+            <label class="option"><input type="checkbox" name="q6_reativacao" value="WhatsApp/ligação"><div class="check checkbox"></div><span>📱 WhatsApp ou ligação</span></label>
+            <label class="option"><input type="checkbox" name="q6_reativacao" value="Promoção/desconto"><div class="check checkbox"></div><span>🏷️ Promoção ou desconto</span></label>
+            <label class="option"><input type="checkbox" name="q6_reativacao" value="Email/SMS"><div class="check checkbox"></div><span>📧 Email ou SMS</span></label>
+            <label class="option"><input type="checkbox" name="q6_reativacao" value="Evento/aulão"><div class="check checkbox"></div><span>🎉 Evento ou aulão especial</span></label>
+            <label class="option"><input type="checkbox" name="q6_reativacao" value="Nada"><div class="check checkbox"></div><span>🤷 Não fazemos nada específico</span></label>
+            <label class="option"><input type="checkbox" name="q6_reativacao" value="Outro"><div class="check checkbox"></div><span>Outro</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q7: Já ofereceu digital -->
+      <div class="step" data-step="7">
+        <div class="question">
+          <div class="question-number">Pergunta 7</div>
+          <h2>Vocês já ofereceram algum tipo de treino online ou digital pros alunos?</h2>
+          <div class="options" data-name="q7_digital" data-type="radio">
+            <label class="option"><input type="radio" name="q7_digital" value="Sim, funcionou"><div class="check"></div><span>Sim, e funcionou bem</span></label>
+            <label class="option"><input type="radio" name="q7_digital" value="Sim, não funcionou"><div class="check"></div><span>Sim, mas não deu certo</span></label>
+            <label class="option"><input type="radio" name="q7_digital" value="Não, queremos"><div class="check"></div><span>Não, mas tenho interesse</span></label>
+            <label class="option"><input type="radio" name="q7_digital" value="Não, sem interesse"><div class="check"></div><span>Não, e não tenho interesse</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q8: Ferramentas de retenção -->
+      <div class="step" data-step="8">
+        <div class="question">
+          <div class="question-number">Pergunta 8</div>
+          <h2>Vocês usam algum sistema ou ferramenta pra gestão e retenção de alunos?</h2>
+          <div class="subtitle">Pode marcar vários!</div>
+          <div class="options" data-name="q8_ferramentas" data-type="checkbox">
+            <label class="option"><input type="checkbox" name="q8_ferramentas" value="Sistema de gestão (EVO, Tecnofit, etc)"><div class="check checkbox"></div><span>📊 Sistema de gestão (EVO, Tecnofit...)</span></label>
+            <label class="option"><input type="checkbox" name="q8_ferramentas" value="App próprio"><div class="check checkbox"></div><span>📱 App próprio da academia</span></label>
+            <label class="option"><input type="checkbox" name="q8_ferramentas" value="Planilha"><div class="check checkbox"></div><span>📋 Planilha / controle manual</span></label>
+            <label class="option"><input type="checkbox" name="q8_ferramentas" value="Redes sociais"><div class="check checkbox"></div><span>📸 Redes sociais (Instagram, WhatsApp)</span></label>
+            <label class="option"><input type="checkbox" name="q8_ferramentas" value="Nenhum"><div class="check checkbox"></div><span>❌ Nenhum</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q9: Valor de reativação -->
+      <div class="step" data-step="9">
+        <div class="question">
+          <div class="question-number">Pergunta 9</div>
+          <h2>Se uma ferramenta pudesse reativar 10% dos seus alunos inativos, quanto valeria pra você por mês?</h2>
+          <div class="options" data-name="q9_valor" data-type="radio">
+            <label class="option"><input type="radio" name="q9_valor" value="Até R$200"><div class="check"></div><span>Até R$200/mês</span></label>
+            <label class="option"><input type="radio" name="q9_valor" value="R$200-500"><div class="check"></div><span>R$200 a R$500/mês</span></label>
+            <label class="option"><input type="radio" name="q9_valor" value="R$500-1000"><div class="check"></div><span>R$500 a R$1.000/mês</span></label>
+            <label class="option"><input type="radio" name="q9_valor" value="R$1000+"><div class="check"></div><span>Mais de R$1.000/mês</span></label>
+            <label class="option"><input type="radio" name="q9_valor" value="Depende"><div class="check"></div><span>Depende dos resultados</span></label>
+          </div>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-next" onclick="nextStep()">Continuar →</button>
+        </div>
+      </div>
+
+      <!-- Q10: Maior desafio -->
+      <div class="step" data-step="10">
+        <div class="question">
+          <div class="question-number">Pergunta 10</div>
+          <h2>Qual o maior desafio da sua academia hoje?</h2>
+          <div class="subtitle">Resposta livre — conta pra gente o que mais te tira o sono!</div>
+          <textarea id="q10_desafio" placeholder="Ex: Perco muitos alunos nos primeiros 3 meses..."></textarea>
+        </div>
+        <div class="nav">
+          <button type="button" class="btn btn-back" onclick="prevStep()">← Voltar</button>
+          <button type="button" class="btn btn-submit" onclick="submitForm()">Enviar ✓</button>
+        </div>
+      </div>
+
+      <!-- Success -->
+      <div class="step" data-step="success">
+        <div class="success-screen">
+          <div class="emoji">🙏</div>
+          <h2>Muito obrigado!</h2>
+          <p>Suas respostas são extremamente valiosas pra gente entender melhor os desafios da gestão de academia.<br><br>Se quiser saber os resultados da pesquisa, é só falar com a gente! 💪</p>
+        </div>
+      </div>
+    </form>
+
+    <div class="privacy">🔒 Suas respostas são confidenciais</div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const totalSteps = 10;
+
+    document.querySelectorAll('.option').forEach(option => {
+      option.addEventListener('click', () => {
+        const input = option.querySelector('input');
+        const container = option.closest('.options');
+        const type = container.dataset.type;
+        if (type === 'radio') {
+          container.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+          input.checked = true;
+        } else {
+          input.checked = !input.checked;
+          option.classList.toggle('selected', input.checked);
+        }
+      });
+    });
+
+    function updateProgress() {
+      const pct = (currentStep / totalSteps) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('stepCounter').textContent = 
+        currentStep <= totalSteps ? `Pergunta ${currentStep} de ${totalSteps}` : '';
+    }
+
+    function showStep(n) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      const target = n === 'success' ? 
+        document.querySelector('[data-step="success"]') : 
+        document.querySelector(`[data-step="${n}"]`);
+      if (target) {
+        target.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function nextStep() {
+      if (currentStep < totalSteps) { currentStep++; showStep(currentStep); updateProgress(); }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) { currentStep--; showStep(currentStep); updateProgress(); }
+    }
+
+    function collectData() {
+      return {
+        versao: 'academia',
+        nome: document.getElementById('q1_nome')?.value || '',
+        academia: document.getElementById('q2_academia')?.value || '',
+        alunos_ativos: document.querySelector('input[name="q3_alunos"]:checked')?.value || '',
+        inativos: document.querySelector('input[name="q4_inativos"]:checked')?.value || '',
+        motivos_cancelamento: Array.from(document.querySelectorAll('input[name="q5_motivos"]:checked')).map(i => i.value),
+        reativacao: Array.from(document.querySelectorAll('input[name="q6_reativacao"]:checked')).map(i => i.value),
+        digital: document.querySelector('input[name="q7_digital"]:checked')?.value || '',
+        ferramentas: Array.from(document.querySelectorAll('input[name="q8_ferramentas"]:checked')).map(i => i.value),
+        valor_reativacao: document.querySelector('input[name="q9_valor"]:checked')?.value || '',
+        maior_desafio: document.getElementById('q10_desafio')?.value || '',
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    async function submitForm() {
+      const data = collectData();
+
+      const emailBody = [
+        `🏢 NOVA RESPOSTA - Pesquisa Academia (B2B)`,
+        ``,
+        `👤 Nome: ${data.nome}`,
+        `🏋️ Academia: ${data.academia || '(não informado)'}`,
+        `📊 Alunos ativos: ${data.alunos_ativos}`,
+        `📉 Inativos (12 meses): ${data.inativos}`,
+        `❌ Motivos de cancelamento: ${data.motivos_cancelamento.join(', ') || '-'}`,
+        `🔄 Estratégia de reativação: ${data.reativacao.join(', ') || '-'}`,
+        `📱 Já ofereceu digital: ${data.digital}`,
+        `🛠️ Ferramentas: ${data.ferramentas.join(', ') || '-'}`,
+        `💰 Valor pra reativar 10%: ${data.valor_reativacao}`,
+        `🎯 Maior desafio: ${data.maior_desafio || '(não respondeu)'}`,
+        `⏰ Data: ${new Date().toLocaleString('pt-BR')}`
+      ].join('\n');
+
+      try {
+        const formData = new FormData();
+        formData.append('_subject', `🏢 Pesquisa Academia — Nova resposta de ${data.nome}`);
+        formData.append('_template', 'box');
+        formData.append('_captcha', 'false');
+        formData.append('message', emailBody);
+        formData.append('Versao', 'Academia (B2B)');
+        formData.append('Nome', data.nome);
+        formData.append('Academia', data.academia);
+        formData.append('Alunos_Ativos', data.alunos_ativos);
+        formData.append('Inativos_12m', data.inativos);
+        formData.append('Motivos_Cancelamento', data.motivos_cancelamento.join(', '));
+        formData.append('Estrategia_Reativacao', data.reativacao.join(', '));
+        formData.append('Digital', data.digital);
+        formData.append('Ferramentas', data.ferramentas.join(', '));
+        formData.append('Valor_Reativacao', data.valor_reativacao);
+        formData.append('Maior_Desafio', data.maior_desafio);
+
+        await fetch('https://formsubmit.co/ajax/luisaoribeiro75@gmail.com', {
+          method: 'POST',
+          body: formData
+        });
+      } catch(e) {
+        console.log('Submission note:', e);
+      }
+
+      const responses = JSON.parse(localStorage.getItem('maxresults_academia_responses') || '[]');
+      responses.push(data);
+      localStorage.setItem('maxresults_academia_responses', JSON.stringify(responses));
+
+      showStep('success');
+      document.getElementById('stepCounter').textContent = '';
+      document.getElementById('progressFill').style.width = '100%';
+    }
+  </script>
+</body>
+</html>
